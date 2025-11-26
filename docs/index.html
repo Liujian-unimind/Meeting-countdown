@@ -1111,6 +1111,9 @@
             <button id="checkAll" class="ghost">全部签到</button>
             <button id="clearCheckin" class="ghost">清空</button>
           </div>
+          <div class="checkin-actions" style="margin-top: 8px;">
+            <button id="copyExcelCol" class="ghost" style="grid-column: 1 / -1;">📋 复制Excel列数据</button>
+          </div>
         </section>
       </div>
 
@@ -2125,6 +2128,115 @@
     if (el.manageNames) {
       el.manageNames.addEventListener('click', manageNamesList);
     }
+
+    // Copy Excel column data
+    const copyExcelColBtn = document.getElementById('copyExcelCol');
+    if (copyExcelColBtn) {
+      copyExcelColBtn.addEventListener('click', async () => {
+        const today = new Date();
+        const month = today.getMonth() + 1;
+        const day = today.getDate();
+        const dateStr = `${month}/${day}`;
+
+        // 定义Excel列的结构（17行）
+        // 第1行：日期
+        // 第2行：刘建
+        // 第3行：余佳
+        // 第4行：建祥
+        // 第5行：宏振
+        // 第6行：江旎
+        // 第7行：爱博
+        // 第8-10行：空
+        // 第11行：海涛
+        // 第12-14行：空
+        // 第15行：李祥
+        // 第16行：艳春
+        // 第17行：乐杰
+
+        const excelData = [];
+
+        // 第1行：日期
+        excelData[0] = dateStr;
+
+        // 第2行：刘建
+        excelData[1] = checkedInNames.has('刘建') ? '参会' : '未参会';
+
+        // 第3行：余佳
+        excelData[2] = checkedInNames.has('余佳') ? '参会' : '未参会';
+
+        // 第4行：建祥
+        excelData[3] = checkedInNames.has('建祥') ? '参会' : '未参会';
+
+        // 第5行：宏振
+        excelData[4] = checkedInNames.has('宏振') ? '参会' : '未参会';
+
+        // 第6行：江旎
+        excelData[5] = checkedInNames.has('江旎') ? '参会' : '未参会';
+
+        // 第7行：爱博
+        excelData[6] = checkedInNames.has('爱博') ? '参会' : '未参会';
+
+        // 第8-10行：空
+        excelData[7] = '';
+        excelData[8] = '';
+        excelData[9] = '';
+
+        // 第11行：海涛
+        excelData[10] = checkedInNames.has('海涛') ? '参会' : '未参会';
+
+        // 第12-14行：空
+        excelData[11] = '';
+        excelData[12] = '';
+        excelData[13] = '';
+
+        // 第15行：李祥
+        excelData[14] = checkedInNames.has('李祥') ? '参会' : '未参会';
+
+        // 第16行：艳春
+        excelData[15] = checkedInNames.has('艳春') ? '参会' : '未参会';
+
+        // 第17行：乐杰
+        excelData[16] = checkedInNames.has('乐杰') ? '参会' : '未参会';
+
+        // 生成制表符分隔的文本（每行一个值）
+        const tableData = excelData.join('\n');
+
+        // 复制到剪贴板
+        try {
+          await navigator.clipboard.writeText(tableData);
+          setStatus(`✓ 已复制Excel列数据 (${dateStr})`);
+
+          // 临时改变按钮文字
+          const originalText = copyExcelColBtn.innerHTML;
+          copyExcelColBtn.innerHTML = '✓ 已复制';
+          copyExcelColBtn.style.background = 'linear-gradient(135deg, rgba(40,199,111,0.2), rgba(40,199,111,0.1))';
+          copyExcelColBtn.style.borderColor = 'rgba(40,199,111,0.5)';
+
+          setTimeout(() => {
+            copyExcelColBtn.innerHTML = originalText;
+            copyExcelColBtn.style.background = '';
+            copyExcelColBtn.style.borderColor = '';
+          }, 2000);
+        } catch (err) {
+          // 降级方案
+          const textarea = document.createElement('textarea');
+          textarea.value = tableData;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            document.execCommand('copy');
+            setStatus(`✓ 已复制Excel列数据 (${dateStr})`);
+          } catch (e) {
+            setStatus('复制失败，请手动复制');
+            console.error('Copy failed:', e);
+          }
+          document.body.removeChild(textarea);
+        }
+      });
+    }
+
 
     // Session complete modal buttons
     if (el.modalContinueBtn) {
